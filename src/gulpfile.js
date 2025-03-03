@@ -13,14 +13,14 @@ import plugin_vcard from './plugins/vcard.js'
 import plugin_vcard_ext from './plugins/vcard-ext.js'
 
 const generator = () => {
-  return gulp.src('data/*/*.yaml')
+  return gulp.src('data/**/*/*.yaml')
     .pipe(through2.obj(plugin_vcard))
     .pipe(rename({ extname: '.vcf' }))
     .pipe(gulp.dest('./temp'))
 }
 
 const generator_ext = () => {
-  return gulp.src('data/*/*.yaml')
+  return gulp.src('data/**/*/*.yaml')
     .pipe(through2.obj(plugin_vcard_ext))
     .pipe(rename({ extname: '.vcf' }))
     .pipe(gulp.dest('./temp'))
