@@ -15,14 +15,14 @@ const plugin = (file, _, cb) => {
     vCard[key] = value
   }
 
-  // 只选择 cellPhone 中 106 长号码
-  if (vCard.cellPhone) {
-    vCard.cellPhone = vCard.cellPhone
-      .filter((phone) => {
-        const phoneStr = `${phone}`
-        return phoneStr.startsWith('106') 
-    })
-  }
+  // // 只选择 cellPhone 中 106 长号码
+  // if (vCard.cellPhone) {
+  //   vCard.cellPhone = vCard.cellPhone
+  //     .filter((phone) => {
+  //       const phoneStr = `${phone}`
+  //       return phoneStr.startsWith('106') 
+  //   })
+  // }
 
   if (!vCard.uid){
     vCard.uid = vCard.organization
