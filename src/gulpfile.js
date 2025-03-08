@@ -33,7 +33,7 @@ const archive = () => {
 }
 
 const combine = () => {
-  return gulp.src('temp/*/*.vcf')
+  return gulp.src('temp/**/*/*.vcf')
     .pipe(concatFolders('汇总'))
     .pipe(rename({ extname: '.all.vcf' }))
     .pipe(gulp.dest('./temp'))
