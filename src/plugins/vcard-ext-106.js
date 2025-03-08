@@ -7,7 +7,10 @@ import addPhoneticField from '../utils/pinyin.js'
 const plugin = (file, _, cb) => {
   const path = file.path
   const data = fs.readFileSync(path, 'utf8')
-  const json = yaml.load(data)
+
+  // 使用 JSON_SCHEMA 解析，防止长数字被当作 Number 处理
+  //const json = yaml.load(data)
+  const json = yaml.load(data, { schema: yaml.JSON_SCHEMA })
 
   let vCard = vCardsJS()
   vCard.isOrganization = true
@@ -23,6 +26,15 @@ const plugin = (file, _, cb) => {
   //       return phoneStr.startsWith('106') 
   //   })
   // }
+
+  // 确保 cellPhone 始终是字符串数组
+  if (json.basic.cellPhone) {
+    if (Array.isArray(json.basic.cellPhone)) {
+      vCard.cellPhone = json.basic.cellPhone.map(phone => String(phone))
+    } else {
+      vCard.cellPhone = [String(json.basic.cellPhone)]
+    }
+  }
 
   if (!vCard.uid){
     vCard.uid = vCard.organization
