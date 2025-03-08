@@ -29,5 +29,8 @@
     "pretty-bytes": "^6.1.1",
     "read-chunk": "^4.0.3",
     "vcards-js": "^2.10.0"
+  },
+  "dependencies": {
+    "gulp-flatmap": "^1.0.2"
   }
 }

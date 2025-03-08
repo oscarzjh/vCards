@@ -7,6 +7,7 @@ import gulp from 'gulp'
 import zip from 'gulp-zip'
 import concat from 'gulp-concat'
 import rename from 'gulp-rename'
+import flatmap from 'gulp-flatmap'
 import concatFolders from 'gulp-concat-folders'
 
 import plugin_vcard from './plugins/vcard.js'
@@ -26,21 +27,53 @@ const generator_ext = () => {
     .pipe(gulp.dest('./temp'))
 }
 
+
 const archive = () => {
   return gulp.src('temp/**')
     .pipe(zip('archive.zip'))
     .pipe(gulp.dest('./public'))
 }
 
+// const combine = () => {
+//   return gulp.src('temp/**/*/*.vcf')
+//     .pipe(concatFolders('汇总'))
+//     .pipe(rename({ extname: '.all.vcf' }))
+//     .pipe(gulp.dest('./temp'))
+// }
+
+
+//你的需求是：
+
+// 1.遍历 temp/ 目录下所有子目录，对同一个目录下的 .vcf 文件合并。
+// 2.合并后的文件命名规则：
+//  以当前目录及其上级目录名称拼接，使用 - 连接，后缀 .all.vcf。
+// 3.输出位置：
+// 根目录变为 temp/汇总/，并且保留原 temp/ 的目录结构。
+
 const combine = () => {
-  return gulp.src('temp/**/*/*.vcf')
-    .pipe(concatFolders('汇总'))
-    .pipe(rename({ extname: '.all.vcf' }))
-    .pipe(gulp.dest('./temp'))
-}
+  return gulp.src('temp/**/*/*.vcf') // 读取所有子目录的 .vcf 文件
+    .pipe(flatmap((stream, file) => {
+      const fileDir = path.dirname(file.path); // 获取当前 .vcf 文件所在目录
+      const relativePath = path.relative('temp', fileDir); // 计算相对路径
+      const folders = relativePath.split(path.sep); // 解析路径为数组
+      const newFileName = folders.join('-') + '.all.vcf'; // 以 `-` 连接所有父级目录
+      const outputDir = path.join('temp/汇总', path.dirname(relativePath)); // 计算输出目录
+
+      return gulp.src(`${fileDir}/*.vcf`) // 读取当前目录下所有 .vcf
+        .pipe(concat(newFileName)) // 合并文件并命名
+        .pipe(gulp.dest(outputDir)); // 输出到 `temp/汇总/` 对应的目录
+    }));
+};
+
+
+// const allinone = () => {
+//   return gulp.src('temp/汇总/*.all.vcf')
+//     .pipe(concat('全部.vcf'))
+//     .pipe(gulp.dest('./temp/汇总'))
+// }
 
 const allinone = () => {
-  return gulp.src('temp/汇总/*.all.vcf')
+  return gulp.src('temp/汇总/**/*.all.vcf')
     .pipe(concat('全部.vcf'))
     .pipe(gulp.dest('./temp/汇总'))
 }
@@ -82,6 +115,7 @@ const distRadicale = () => {
 
 const build = gulp.series(clean, generator, combine, allinone, archive)
 const radicale = gulp.series(clean, generator_ext, createRadicale, cleanRadicale, distRadicale)
+
 
 export {
   generator,
